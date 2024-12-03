@@ -6,12 +6,17 @@ Need installed and setuped PostgreSQL, Erlang and Elixir
 
 ## Run app
 
-Write ip, port, username, password to `config.exs`
+```bash
+git clone https://github.com/aabashin/seeds_app.git
+cd seeds_app
+```
+
+Write ip, port, username, password to `config.exs`, `dev.exs`, `test.exs`
 
 ```bash
 $ mix deps.get
-$ mix ecto.create
-$ mix ecto.migrate
+$ mix ecto.setup
+$ mix test
 $ iex -S mix
 iex> SeedsApp.seeds()
 ```
@@ -22,6 +27,20 @@ To see help run
 
 ```bash
 h SeedsApp.seeds()
+```
+
+## Clear DB
+
+To delete all records run
+
+```bash
+iex> SeedsApp.clear_all()
+```
+
+## Delete & create new db
+
+```bash
+$ mix ecto.reset
 ```
 
 ## DB structure
@@ -36,5 +55,5 @@ Tables:
 Referenses:
 
 * User has one Account
-* Meetings has many Rooms
-* Meetings has many Users
+* Rooms has many Meetings
+* Users has many Meetings
