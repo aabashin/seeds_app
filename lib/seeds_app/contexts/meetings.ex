@@ -23,7 +23,7 @@ defmodule SeedsApp.Contexts.Meetings do
   @doc """
   Calculate Meetings count
   """
-  @spec count() :: Integer.t()
+  @spec count() :: pos_integer()
   def count do
     Repo.aggregate(Meeting, :count)
   end
@@ -31,7 +31,7 @@ defmodule SeedsApp.Contexts.Meetings do
   @doc """
   Delete all
   """
-  @spec delete_all() :: {Integer.t(), nil}
+  @spec delete_all() :: {pos_integer(), nil}
   def delete_all do
     Repo.delete_all(Meeting)
   end

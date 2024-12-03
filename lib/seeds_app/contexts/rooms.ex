@@ -22,7 +22,7 @@ defmodule SeedsApp.Contexts.Rooms do
   @doc """
   Calculate Rooms count
   """
-  @spec count() :: Integer.t()
+  @spec count() :: pos_integer()
   def count do
     Repo.aggregate(Room, :count)
   end

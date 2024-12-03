@@ -19,12 +19,12 @@ defmodule SeedsApp.GenerateParams do
     }
   end
 
-  @spec room() :: Type.room()
+  @spec room() :: Types.room()
   def room do
     %{title: Faker.Lorem.word()}
   end
 
-  @spec meeting(user_id :: pos_integer(), room_id :: pos_integer()) :: Type.meeting()
+  @spec meeting(user_id :: pos_integer(), room_id :: pos_integer()) :: Types.metting()
   def meeting(user_id, room_id) do
     %{theme: Faker.Lorem.sentence(), user_id: user_id, room_id: room_id}
   end

@@ -1,4 +1,8 @@
 defmodule SeedsApp.Contexts.Models.Meeting do
+  @moduledoc """
+  Meeting schema
+  """
+
   use Ecto.Schema
 
   import Ecto.Changeset

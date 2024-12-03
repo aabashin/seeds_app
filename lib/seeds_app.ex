@@ -3,9 +3,9 @@ defmodule SeedsApp do
   Module for seeds DB randomize records
   """
 
-  alias SeedsApp.Contexts.UsersAccounts
   alias SeedsApp.Contexts.Meetings
   alias SeedsApp.Contexts.Rooms
+  alias SeedsApp.Contexts.UsersAccounts
 
   @doc """
   Seeds DB random records
@@ -107,7 +107,7 @@ defmodule SeedsApp do
     %{created: created, all_count: all_count, ids: ids}
   end
 
-  @spec get_rand_id(list(), Integer.t()) :: Integer.t()
+  @spec get_rand_id(list(), pos_integer()) :: pos_integer()
   defp get_rand_id(ids, count) do
     Enum.at(ids, :rand.uniform(count) - 1)
   end
