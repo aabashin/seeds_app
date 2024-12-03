@@ -1,4 +1,8 @@
 defmodule SeedsApp.Contexts.Models.Room do
+  @moduledoc """
+  Room schema
+  """
+
   use Ecto.Schema
 
   import Ecto.Changeset

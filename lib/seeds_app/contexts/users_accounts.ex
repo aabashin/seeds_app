@@ -21,7 +21,7 @@ defmodule SeedsApp.Contexts.UsersAccounts do
   @doc """
   Get Users records count
   """
-  @spec count() :: Integer.t()
+  @spec count() :: pos_integer()
   def count do
     Repo.aggregate(User, :count)
   end
