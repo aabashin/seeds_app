@@ -5,7 +5,7 @@ defmodule SeedsApp.Repo.RoomFactory do
 
       def room_factory do
         %Room{
-          title: Faker.Lorem.word()
+          title: Faker.Lorem.sentence()
         }
       end
     end

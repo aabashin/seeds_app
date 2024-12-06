@@ -32,6 +32,25 @@ defmodule Contexts.UsersAccountsTest do
     assert @count == UsersAccounts.count()
   end
 
+  test "get_max_user_id/0" do
+    Factory.insert_list(@count, :user)
+    expected_id =
+      User
+      |> select([u], max(u.id))
+      |> Repo.one()
+
+    assert ^expected_id = UsersAccounts.get_max_user_id()
+  end
+
+  test "get_max_user_id/0 return 0 if no Users in DB" do
+    Repo.delete_all(User)
+    refute User
+            |> select([u], max(u.id))
+            |> Repo.one()
+
+    assert 0 = UsersAccounts.get_max_user_id()
+  end
+
   test "delete_all/0" do
     Factory.insert_list(@count, :account)
 

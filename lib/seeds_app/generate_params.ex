@@ -10,18 +10,18 @@ defmodule SeedsApp.GenerateParams do
     %{balance: :rand.uniform(), login: generate_boolean(), user_id: user_id}
   end
 
-  @spec user() :: Types.user()
-  def user do
+  @spec user(id :: pos_integer()) :: Types.user()
+  def user(id) do
     %{
       name: Faker.Person.first_name(),
       age: :rand.uniform(100),
-      email: Faker.Internet.email()
+      email: Faker.Lorem.word() <> "#{id}@mail.ru"
     }
   end
 
-  @spec room() :: Types.room()
-  def room do
-    %{title: Faker.Lorem.word()}
+  @spec room(id :: pos_integer()) :: Types.room()
+  def room(id) do
+    %{title: Faker.Lorem.word() <> "#{id}"}
   end
 
   @spec meeting(user_id :: pos_integer(), room_id :: pos_integer()) :: Types.metting()

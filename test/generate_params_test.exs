@@ -11,11 +11,13 @@ defmodule GenerateParamsTest do
   end
 
   test "user/0" do
-    assert %{name: _name, email: _email, age: _age} = GenerateParams.user()
+    id = :rand.uniform(1_000)
+    assert %{name: _name, email: _email, age: _age} = GenerateParams.user(id)
   end
 
   test "room/0" do
-    assert %{title: _title} = GenerateParams.room()
+    id = :rand.uniform(1_000)
+    assert %{title: _title} = GenerateParams.room(id)
   end
 
   test "meeting/2" do

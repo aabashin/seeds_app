@@ -19,4 +19,23 @@ defmodule Contexts.RoomsTest do
     %{id: room_id} = Factory.insert(:room)
     assert [^room_id] = Rooms.get_ids()
   end
+
+  test "get_max_id/0" do
+    Factory.insert_list(10, :room)
+    expected_id =
+      Room
+      |> select([r], max(r.id))
+      |> Repo.one()
+
+    assert ^expected_id = Rooms.get_max_id()
+  end
+
+  test "get_max_id/0 return 0 if no Rooms in DB" do
+    Repo.delete_all(Room)
+    refute Room
+            |> select([r], max(r.id))
+            |> Repo.one()
+
+    assert 0 = Rooms.get_max_id()
+  end
 end

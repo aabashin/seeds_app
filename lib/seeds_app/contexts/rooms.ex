@@ -14,8 +14,11 @@ defmodule SeedsApp.Contexts.Rooms do
   """
   @spec create() :: {:ok, Room.t()} | {:error, Ecto.Changeset.t()}
   def create do
+    id = get_max_id() + 1
+    params = GenerateParams.room(id)
+
     %Room{}
-    |> Room.changeset(GenerateParams.room())
+    |> Room.changeset(params)
     |> Repo.insert()
   end
 
@@ -38,6 +41,22 @@ defmodule SeedsApp.Contexts.Rooms do
     Room
     |> select([r], r.id)
     |> Repo.all()
+  end
+
+  @doc """
+  Get max id
+  """
+  @spec get_max_id() :: pos_integer()
+  def get_max_id do
+    id =
+      Room
+      |> select([r], max(r.id))
+      |> Repo.one()
+
+    case id do
+      nil -> 0
+      id -> id
+    end
   end
 
   @doc """
