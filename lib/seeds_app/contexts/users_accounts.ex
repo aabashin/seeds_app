@@ -41,12 +41,31 @@ defmodule SeedsApp.Contexts.UsersAccounts do
   """
   @spec create() :: {:ok, any()} | {:error, any()}
   def create do
+    id = get_max_user_id() + 1
+    params = GenerateParams.user(id)
+
     Multi.new()
-    |> Multi.insert(:user, User.changeset(%User{}, GenerateParams.user()))
+    |> Multi.insert(:user, User.changeset(%User{}, params))
     |> Multi.insert(:account, fn %{user: user} ->
       Account.changeset(%Account{}, GenerateParams.account(user.id))
     end)
     |> Repo.transaction()
+  end
+
+    @doc """
+  Get max id
+  """
+  @spec get_max_user_id() :: pos_integer()
+  def get_max_user_id do
+    id =
+      User
+      |> select([u], max(u.id))
+      |> Repo.one()
+
+    case id do
+      nil -> 0
+      id -> id
+    end
   end
 
   @doc """

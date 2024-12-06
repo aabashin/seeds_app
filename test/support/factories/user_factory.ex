@@ -7,7 +7,7 @@ defmodule SeedsApp.Repo.UserFactory do
         %User{
           name: Faker.Person.first_name(),
           age: :rand.uniform(100),
-          email: Faker.Internet.email()
+          email: Faker.Internet.email() <> "#{:rand.uniform(1_000_000)}"
         }
       end
     end

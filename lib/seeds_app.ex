@@ -57,8 +57,8 @@ defmodule SeedsApp do
     %{minutes: minutes, seconds: seconds} = time_calculate(start_time)
 
     IO.puts("Done\n
-              Created #{created_users} Users, #{created_rooms} Rooms and #{created_meetings} Meetings\n
-              Now in DB #{users_in_db} Users, #{rooms_in_db} Rooms and #{meetings_in_db} Meetings\n
+              Created #{created_users} Users & Accounts, #{created_rooms} Rooms and #{created_meetings} Meetings\n
+              Now in DB #{users_in_db} Users & Accounts, #{rooms_in_db} Rooms and #{meetings_in_db} Meetings\n
               Elapsed time: #{minutes} min #{seconds} sec")
   end
 
@@ -98,6 +98,7 @@ defmodule SeedsApp do
         case context.create() do
           {:ok, _transaction} -> acc + 1
           {:error, _error} -> acc
+          {:error, _context, _error, _so_far} -> acc
         end
       end)
 
