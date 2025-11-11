@@ -17,25 +17,27 @@ Write ip, port, username, password to `config.exs`, `dev.exs`, `test.exs`
 $ mix deps.get
 $ mix ecto.setup
 $ mix test
-$ iex -S mix
-iex> SeedsApp.seeds()
+$ mix phx.server
 ```
 
-DB seeds random records
+Routes accessed for you
+
+```bash
+# seeds db
+$ curl -X POST http://localhost:4000/api/seeds
+# or with count of records
+$ curl -X POST http://localhost:4000/api/seeds?users_count=5&rooms_count=5&meetings_count=5
+# clear db
+$ curl -X DELETE http://localhost:4000/api/seeds
+# view satistics
+$ curl http://localhost:4000/api/stats
+```
+
+You can open url http://localhost:4000/api/stats in your browser for see statistics
 
 To see help run
 
-```bash
-h SeedsApp.seeds()
-```
-
-## Clear DB
-
-To delete all records run
-
-```bash
-iex> SeedsApp.clear_all()
-```
+TODO create API
 
 ## Delete & create new db
 

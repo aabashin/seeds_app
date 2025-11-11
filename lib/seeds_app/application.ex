@@ -6,7 +6,8 @@ defmodule SeedsApp.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      SeedsApp.Repo
+      SeedsApp.Repo,
+      SeedsAppWeb.Endpoint
     ]
 
     opts = [strategy: :one_for_one, name: SeedsApp.Supervisor]
