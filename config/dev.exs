@@ -12,3 +12,13 @@ config :seeds_app, SeedsApp.Repo,
   ownership_timeout: 15_000_000,
   pool: Ecto.Adapters.SQL.Sandbox,
   log: false
+
+config :seeds_app, SeedsAppWeb.Endpoint,
+  http: [ip: {127, 0, 0, 1}, port: 4000],
+  debug_errors: true,
+  code_reloader: true,
+  check_origin: false,
+  watchers: []
+
+config :phoenix, :stacktrace_depth, 20
+config :phoenix, :plug_init_mode, :runtime

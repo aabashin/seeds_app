@@ -5,7 +5,7 @@ defmodule SeedsApp.MixProject do
     [
       app: :seeds_app,
       version: "0.1.0",
-      elixir: "~> 1.17",
+      elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
@@ -13,7 +13,6 @@ defmodule SeedsApp.MixProject do
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       extra_applications: [:logger],
@@ -21,7 +20,6 @@ defmodule SeedsApp.MixProject do
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       {:ecto_sql, "~> 3.12"},
@@ -29,7 +27,11 @@ defmodule SeedsApp.MixProject do
       {:faker, "~> 0.18"},
       {:dialyxir, "1.4.5", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7.10", only: [:dev, :test], runtime: false},
-      {:ex_machina, "~> 2.8", only: :test}
+      {:ex_machina, "~> 2.8", only: :test},
+      {:phoenix, "~> 1.7.0"},
+      {:phoenix_ecto, "~> 4.4"},
+      {:plug_cowboy, "~> 2.5"},
+      {:jason, "~> 1.2"}
     ]
   end
 
