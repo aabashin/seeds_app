@@ -8,7 +8,8 @@ defmodule SeedsAppTest do
   alias SeedsApp.Repo
 
   test "success seeds" do
-    assert :ok = SeedsApp.seeds(1, 1, 1)
+    assert {:ok, %{message: message}} = SeedsApp.seeds(1, 1, 1)
+    assert message =~ "Created 1 Users & Accounts, 1 Rooms and 1 Meetings."
 
     assert [%{id: room_id, title: _title}] = Repo.all(Room)
     assert [%{id: user_id, name: _name, age: _age, email: _email}] = Repo.all(User)
@@ -17,7 +18,8 @@ defmodule SeedsAppTest do
   end
 
   test "don't create records id db, if args is incorrect" do
-    assert :ok = SeedsApp.seeds("some incorrect")
+    assert {:error, "Some attrs is incorrect. See the help on /api/help"} =
+             SeedsApp.seeds("some incorrect")
 
     assert [] = Repo.all(Room)
     assert [] = Repo.all(User)

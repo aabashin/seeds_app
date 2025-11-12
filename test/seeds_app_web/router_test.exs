@@ -19,8 +19,8 @@ defmodule SeedsAppWeb.RouterTest do
     assert conn.status == 200
   end
 
-  # test "non-existent API routes return 404", %{conn: conn} do
-  #   conn = get(conn, "/api/nonexistent")
-  #   assert conn.status == 404
-  # end
+  test "non-existent API routes return 404", %{conn: conn} do
+    conn = get(conn, "/api/nonexistent")
+    assert conn.status == 404
+  end
 end

@@ -52,7 +52,7 @@ defmodule SeedsApp.Contexts.UsersAccounts do
     |> Repo.transaction()
   end
 
-    @doc """
+  @doc """
   Get max id
   """
   @spec get_max_user_id() :: pos_integer()

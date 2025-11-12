@@ -9,11 +9,11 @@ defmodule SeedsAppWeb.SeedsController do
     meetings_count = parse_integer(params["meetings_count"], 10)
 
     case SeedsApp.seeds(users_count, rooms_count, meetings_count) do
-      :ok ->
-        json(conn, %{status: "success", message: "Database seeded successfully"})
+      {:ok, message} ->
+        json(conn, %{status: "success", message: message})
 
-      _ ->
-        json(conn, %{status: "error", message: "Failed to seed database"})
+      {:error, errors} ->
+        json(conn, %{status: "error", message: errors})
     end
   end
 
@@ -34,12 +34,18 @@ defmodule SeedsAppWeb.SeedsController do
     json(conn, %{status: "success", data: stats})
   end
 
+  def help(conn, _params) do
+    json(conn, %{message: "TODO help"})
+  end
+
   defp parse_integer(nil, default), do: default
+
   defp parse_integer(value, default) when is_binary(value) do
     case Integer.parse(value) do
       {number, _} -> number
       :error -> default
     end
   end
+
   defp parse_integer(_, default), do: default
 end
