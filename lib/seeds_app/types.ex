@@ -34,4 +34,13 @@ defmodule SeedsApp.Types do
           required(:user_id) => pos_integer(),
           required(:room_id) => pos_integer()
         }
+
+  @typedoc """
+  Create context result
+  """
+  @type create_context_result() :: %{
+          required(:created) => non_neg_integer(),
+          required(:all_count) => non_neg_integer(),
+          optional(:ids) => list()
+        }
 end
