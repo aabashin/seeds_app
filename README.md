@@ -2,9 +2,33 @@
 
 Simple elixir application with Ecto lib and Posgrex adapter for demonstrate Elixir works with DB
 
-Need installed and setuped PostgreSQL, Erlang and Elixir
+Need installed and setuped PostgreSQL, Erlang 27.1.1 and Elixir 1.18.4-otp-27
 
-## Run app
+## Run app in production mode
+
+Set env variables:
+
+- PHX_HOST
+- PHX_PORT
+- DB
+- DB_USER
+- DB_PASS
+- DB_HOST
+
+```bash
+$ git clone https://github.com/aabashin/seeds_app.git
+$ cd seeds_app
+```
+
+Set variables in `config/runtime.exs`
+
+```bash
+$ MIX_ENV=prod mix release
+$ cd _build/prod/rel/seeds_app/bin
+$ ./seeds_app start
+```
+
+## Run app in dev mode
 
 ```bash
 git clone https://github.com/aabashin/seeds_app.git
