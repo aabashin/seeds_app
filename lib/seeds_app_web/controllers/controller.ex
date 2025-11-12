@@ -3,6 +3,8 @@ defmodule SeedsAppWeb.SeedsController do
 
   alias SeedsApp
 
+  plug :put_layout, false
+
   def create(conn, params) do
     users_count = parse_integer(params["users_count"], 10)
     rooms_count = parse_integer(params["rooms_count"], 10)
@@ -35,7 +37,10 @@ defmodule SeedsAppWeb.SeedsController do
   end
 
   def help(conn, _params) do
-    json(conn, %{message: "TODO help"})
+    conn
+    |> put_view(SeedsAppWeb.SeedsView)
+    |> put_format(:html)
+    |> render("help.html")
   end
 
   defp parse_integer(nil, default), do: default

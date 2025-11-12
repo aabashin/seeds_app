@@ -17,7 +17,7 @@ defmodule SeedsAppWeb do
   def view do
     quote do
       use Phoenix.View,
-        root: "lib/seeds_app_web/templates/error",
+        root: "lib/seeds_app_web/templates",
         namespace: SeedsAppWeb,
         pattern: "**/*"
 

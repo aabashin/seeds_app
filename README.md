@@ -61,7 +61,7 @@ You can open url http://localhost:4000/api/stats in your browser for see statist
 
 To see help run
 
-TODO create API
+http://localhost:4000/api/help
 
 ## Delete & create new db
 
@@ -78,7 +78,7 @@ Tables:
 * Rooms
 * Meetings
 
-Referenses:
+References:
 
 * User has one Account
 * Rooms has many Meetings

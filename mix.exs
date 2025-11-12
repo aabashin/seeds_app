@@ -31,6 +31,7 @@ defmodule SeedsApp.MixProject do
       {:phoenix, "~> 1.7.0"},
       {:phoenix_html, "~> 3.3"},
       {:phoenix_view, "~> 2.0"},
+      {:phoenix_live_view, "~> 0.20.0"},
       {:phoenix_ecto, "~> 4.4"},
       {:plug_cowboy, "~> 2.5"},
       {:jason, "~> 1.2"}
