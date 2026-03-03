@@ -29,6 +29,38 @@ defmodule SeedsApp.GenerateParams do
     %{theme: Faker.Lorem.sentence(), user_id: user_id, room_id: room_id}
   end
 
+  # Batch functions
+
+  @spec users_list(start_id :: pos_integer(), count :: pos_integer()) :: [Types.user()]
+  def users_list(start_id, count) do
+    start_id..(start_id + count - 1)
+    |> Enum.map(&user/1)
+  end
+
+  @spec rooms_list(start_id :: pos_integer(), count :: pos_integer()) :: [Types.room()]
+  def rooms_list(start_id, count) do
+    start_id..(start_id + count - 1)
+    |> Enum.map(&room/1)
+  end
+
+  @spec accounts_list(user_ids :: [pos_integer()]) :: [Types.account()]
+  def accounts_list(user_ids) do
+    Enum.map(user_ids, &account/1)
+  end
+
+  @spec meetings_list(
+          user_ids :: [pos_integer()],
+          room_ids :: [pos_integer()],
+          count :: pos_integer()
+        ) :: [Types.metting()]
+  def meetings_list(user_ids, room_ids, count) do
+    Enum.map(1..count, fn _ ->
+      user_id = Enum.random(user_ids)
+      room_id = Enum.random(room_ids)
+      meeting(user_id, room_id)
+    end)
+  end
+
   @spec generate_boolean() :: boolean()
   defp generate_boolean, do: :rand.uniform(2) == 1
 end
