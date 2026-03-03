@@ -7,6 +7,7 @@ defmodule SeedsApp.Application do
   def start(_type, _args) do
     children = [
       SeedsApp.Repo,
+      {Phoenix.PubSub, name: SeedsApp.PubSub},
       SeedsAppWeb.Endpoint
     ]
 
