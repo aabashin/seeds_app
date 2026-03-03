@@ -90,4 +90,14 @@ defmodule SeedsAppWeb.SeedsControllerTest do
       assert response["data"]["meetings"] == 4
     end
   end
+
+  describe "/help" do
+    test "success", %{conn: conn} do
+      assert conn = %Plug.Conn{} = get(conn, "/api/help")
+
+      assert conn.status == 200
+      assert conn.path_info == ["api", "help"]
+      assert conn.request_path == "/api/help"
+    end
+  end
 end

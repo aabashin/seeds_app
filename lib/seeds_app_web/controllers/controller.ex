@@ -25,7 +25,7 @@ defmodule SeedsAppWeb.SeedsController do
   end
 
   def stats(conn, _params) do
-    alias SeedsApp.Contexts.{UsersAccounts, Rooms, Meetings}
+    alias SeedsApp.Contexts.{Meetings, Rooms, UsersAccounts}
 
     stats = %{
       users: UsersAccounts.count(),

@@ -9,5 +9,8 @@ defmodule SeedsApp.Repo.Migrations.AddMettingsTable do
 
       timestamps()
     end
+
+    create index(:meetings, [:user_id])
+    create index(:meetings, [:room_id])
   end
 end
