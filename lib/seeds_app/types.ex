@@ -43,4 +43,24 @@ defmodule SeedsApp.Types do
           required(:all_count) => non_neg_integer(),
           optional(:ids) => list()
         }
+
+  @typedoc """
+  List of user records
+  """
+  @type users_list() :: [user()]
+
+  @typedoc """
+  List of room records
+  """
+  @type rooms_list() :: [room()]
+
+  @typedoc """
+  List of account records
+  """
+  @type accounts_list() :: [account()]
+
+  @typedoc """
+  List of meeting records
+  """
+  @type meetings_list() :: [metting()]
 end

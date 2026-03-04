@@ -10,8 +10,8 @@ defmodule SeedsAppWeb.SeedsControllerTest do
       response = json_response(conn, 200)
 
       assert response["status"] == "success"
-      assert %{"message" => message} = response["message"]
-      assert message =~ "Created 10 Users & Accounts, 10 Rooms and 10 Meetings."
+      assert is_binary(response["message"])
+      assert response["message"] =~ "Created 10 Users & Accounts, 10 Rooms and 10 Meetings."
 
       # Проверяем, что данные создались
       assert UsersAccounts.count() > 0
@@ -24,8 +24,8 @@ defmodule SeedsAppWeb.SeedsControllerTest do
       response = json_response(conn, 200)
 
       assert response["status"] == "success"
-      assert %{"message" => message} = response["message"]
-      assert message =~ "Created 5 Users & Accounts, 3 Rooms and 7 Meetings."
+      assert is_binary(response["message"])
+      assert response["message"] =~ "Created 5 Users & Accounts, 3 Rooms and 7 Meetings."
 
       # Проверяем, что создалось нужное количество записей
       assert UsersAccounts.count() >= 5

@@ -7,10 +7,15 @@ defmodule SeedsApp.Contexts.UsersAccounts do
 
   alias Ecto.Multi
 
+  alias SeedsApp.ChunkHelper
   alias SeedsApp.Contexts.Models.Account
   alias SeedsApp.Contexts.Models.User
   alias SeedsApp.GenerateParams
   alias SeedsApp.Repo
+  alias SeedsApp.Types
+
+  # Кол-во колонок для расчёта чанка (name, age, email, inserted_at, updated_at)
+  @columns_count 5
 
   @doc """
   Get User by params
@@ -74,4 +79,50 @@ defmodule SeedsApp.Contexts.UsersAccounts do
   """
   @spec delete_all() :: {:ok, any()} | {:error, any()}
   def delete_all, do: Repo.delete_all(User)
+
+  @doc """
+  Creates batch of users with accounts using insert_all with chunking
+  """
+  @spec create_batch(count :: pos_integer()) :: {:ok, Types.create_context_result()} | {:error, String.t()}
+  def create_batch(count) when is_integer(count) and count > 0 do
+    start_id = get_max_user_id() + 1
+    user_params_list = GenerateParams.users_list(start_id, count)
+
+    # Добавляем timestamps для батчевой вставки
+    now = NaiveDateTime.utc_now()
+
+    # Вставляем пользователей чанками
+    user_params_with_timestamps = Enum.map(user_params_list, fn params ->
+      Map.merge(params, %{inserted_at: now, updated_at: now})
+    end)
+
+    {:ok, users_result} = ChunkHelper.chunk_insert(
+      user_params_with_timestamps,
+      @columns_count,
+      fn chunk -> Repo.insert_all(User, chunk, returning: [:id]) end
+    )
+
+    # Получаем только id вставленных пользователей (те, которые >= start_id)
+    user_ids = User
+      |> where([u], u.id >= ^start_id)
+      |> select([u], u.id)
+      |> Repo.all()
+
+    # Генерируем и вставляем аккаунты чанками
+    account_params_list = GenerateParams.accounts_list(user_ids)
+    account_params_with_timestamps = Enum.map(account_params_list, fn params ->
+      Map.merge(params, %{inserted_at: now, updated_at: now})
+    end)
+
+    # Для accounts тоже 5 колонок (balance, login, user_id, inserted_at, updated_at)
+    ChunkHelper.chunk_insert(
+      account_params_with_timestamps,
+      @columns_count,
+      fn chunk -> Repo.insert_all(Account, chunk) end
+    )
+
+    {:ok, %{created: users_result.total, all_count: count(), ids: user_ids}}
+  end
+
+  def create_batch(_count), do: {:error, "Count must be a positive integer"}
 end

@@ -11,7 +11,7 @@ defmodule SeedsAppWeb.SeedsController do
     meetings_count = parse_integer(params["meetings_count"], 10)
 
     case SeedsApp.seeds(users_count, rooms_count, meetings_count) do
-      {:ok, message} ->
+      {:ok, %{message: message}} ->
         json(conn, %{status: "success", message: message})
 
       {:error, errors} ->
