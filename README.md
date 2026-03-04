@@ -44,24 +44,57 @@ $ mix test
 $ mix phx.server
 ```
 
-Routes accessed for you
+## API Endpoints
+
+### Seeds (async)
 
 ```bash
-# seeds db
+# Create seeds (async) - returns task_id immediately
 $ curl -X POST http://localhost:4000/api/seeds
-# or with count of records
-$ curl -X POST http://localhost:4000/api/seeds?users_count=5&rooms_count=5&meetings_count=5
-# clear db
+# or with custom count
+$ curl -X POST http://localhost:4000/api/seeds?users_count=5000&rooms_count=5000&meetings_count=5000
+
+# Response:
+# {"message":"Task enqueued","status":"success","task_id":"a1b2c3d4e5f6"}
+```
+
+### Status
+
+```bash
+# Check task status
+$ curl http://localhost:4000/api/seeds/status?task_id=a1b2c3d4e5f6
+
+# Response:
+# {"data":{"meetings_count":5000,"rooms_count":5000,"status":"completed","task_id":"a1b2c3d4e5f6","users_count":5000},"status":"success"}
+
+# Possible statuses: pending, running, completed, failed
+```
+
+### Clear & Stats
+
+```bash
+# Clear database
 $ curl -X DELETE http://localhost:4000/api/seeds
-# view satistics
+
+# View statistics
 $ curl http://localhost:4000/api/stats
+```
+
+### Help
+
+```bash
+# View help
+$ curl http://localhost:4000/api/help
 ```
 
 You can open url http://localhost:4000/api/stats in your browser for see statistics
 
-To see help run
+## Features
 
-http://localhost:4000/api/help
+- **Async processing** — tasks are queued and processed in background
+- **Queue limit** — maximum 10 concurrent tasks (configurable)
+- **Parallel insert** — uses TaskSupervisor for parallel data insertion
+- **Dynamic chunking** — automatically splits large datasets to respect PostgreSQL limit (65,535 parameters)
 
 ## Delete & create new db
 

@@ -5,12 +5,17 @@ defmodule Contexts.MeetingTest do
   alias SeedsApp.Contexts.Meetings
   alias SeedsApp.Contexts.Rooms
   alias SeedsApp.Contexts.UsersAccounts
+  alias SeedsApp.Contexts.Rooms
+  alias SeedsApp.Contexts.UsersAccounts
   alias SeedsApp.Repo
 
   describe "single record operations" do
     test "create/2" do
       %{id: user_id} = Factory.insert(:user)
       %{id: room_id} = Factory.insert(:room)
+
+      assert {:ok, %Meeting{user_id: ^user_id, room_id: ^room_id}} =
+               Meetings.create(user_id, room_id)
 
       assert {:ok, %Meeting{user_id: ^user_id, room_id: ^room_id}} =
                Meetings.create(user_id, room_id)
@@ -74,7 +79,10 @@ defmodule Contexts.MeetingTest do
       end)
     end
 
-    test "create_batch/3 returns error when count is invalid", %{user_ids: user_ids, room_ids: room_ids} do
+    test "create_batch/3 returns error when count is invalid", %{
+      user_ids: user_ids,
+      room_ids: room_ids
+    } do
       assert {:error, _} = Meetings.create_batch(0, user_ids, room_ids)
       assert {:error, _} = Meetings.create_batch(-1, user_ids, room_ids)
       assert {:error, _} = Meetings.create_batch("invalid", user_ids, room_ids)

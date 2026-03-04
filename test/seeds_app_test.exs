@@ -1,11 +1,25 @@
 defmodule SeedsAppTest do
   use SeedsApp.DataCase
 
+  # Тесты выполняются не асинхронно для избежания race condition с асинхронными задачами
+  use ExUnit.Case, async: false
+
   alias SeedsApp.Contexts.Models.Account
   alias SeedsApp.Contexts.Models.Meeting
   alias SeedsApp.Contexts.Models.Room
   alias SeedsApp.Contexts.Models.User
   alias SeedsApp.Repo
+
+  setup do
+    # Очищаем очередь задач перед тестом
+    case Process.whereis(SeedsApp.AsyncSeeds) do
+      nil ->
+        :ok
+
+      _ ->
+        SeedsApp.AsyncSeeds.clear_queue()
+    end
+  end
 
   test "success seeds" do
     assert {:ok, %{message: message}} = SeedsApp.seeds(1, 1, 1)
@@ -32,7 +46,8 @@ defmodule SeedsAppTest do
     Factory.insert(:user)
     Factory.insert(:meeting)
 
-    assert {2, nil} = SeedsApp.clear_all()
+    assert %{deleted_meetings_count: 1, deleted_rooms_count: 2, deleted_users_accounts_count: 2} =
+             SeedsApp.clear_all()
 
     assert [] = Repo.all(Room)
     assert [] = Repo.all(User)

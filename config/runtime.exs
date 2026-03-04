@@ -20,12 +20,14 @@ database = System.get_env("DB") || "seeds_dev"
 db_username = System.get_env("DB_USER") || "postgres"
 db_password = System.get_env("DB_PASS") || "postgres"
 db_host = System.get_env("DB_HOST") || "localhost"
+db_port = System.get_env("DB_PORT") || 5433
 
 config :seeds_app, SeedsApp.Repo,
   database: database,
   username: db_username,
   password: db_password,
   hostname: db_host,
+  port: db_port,
   pool_size: 10,
   timeout: 120_000,
   queue_target: 5000,

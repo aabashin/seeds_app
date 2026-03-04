@@ -2,7 +2,29 @@ defmodule SeedsAppWeb.SeedsControllerTest do
   use SeedsAppWeb.ConnCase
 
   alias SeedsApp
+  alias SeedsApp.AsyncSeeds
   alias SeedsApp.Contexts.{UsersAccounts, Rooms, Meetings}
+
+  setup do
+    # Запускаем TaskSupervisor и AsyncSeeds для тестов
+    case Process.whereis(SeedsApp.TaskSupervisor) do
+      nil ->
+        start_supervised!({Task.Supervisor, name: SeedsApp.TaskSupervisor})
+
+      _ ->
+        :ok
+    end
+
+    case Process.whereis(AsyncSeeds) do
+      nil ->
+        start_supervised!(AsyncSeeds)
+
+      _ ->
+        AsyncSeeds.clear_queue()
+    end
+
+    :ok
+  end
 
   describe "create/2" do
     test "creates seeds with default parameters", %{conn: conn} do
@@ -10,8 +32,11 @@ defmodule SeedsAppWeb.SeedsControllerTest do
       response = json_response(conn, 200)
 
       assert response["status"] == "success"
-      assert is_binary(response["message"])
-      assert response["message"] =~ "Created 10 Users & Accounts, 10 Rooms and 10 Meetings."
+      assert response["message"] == "Task enqueued"
+      assert is_binary(response["task_id"])
+
+      # Ждём завершения задачи
+      Process.sleep(1000)
 
       # Проверяем, что данные создались
       assert UsersAccounts.count() > 0
@@ -24,13 +49,52 @@ defmodule SeedsAppWeb.SeedsControllerTest do
       response = json_response(conn, 200)
 
       assert response["status"] == "success"
-      assert is_binary(response["message"])
-      assert response["message"] =~ "Created 5 Users & Accounts, 3 Rooms and 7 Meetings."
+      assert response["message"] == "Task enqueued"
+      assert is_binary(response["task_id"])
+
+      # Ждём завершения задачи
+      Process.sleep(1000)
 
       # Проверяем, что создалось нужное количество записей
       assert UsersAccounts.count() >= 5
       assert Rooms.count() >= 3
       assert Meetings.count() >= 7
+    end
+  end
+
+  describe "status/2" do
+    test "returns error when task_id is not provided", %{conn: conn} do
+      conn = get(conn, "/api/seeds/status")
+      response = json_response(conn, 200)
+
+      assert response["status"] == "error"
+      assert response["message"] == "task_id is required"
+    end
+
+    test "returns error for invalid task_id", %{conn: conn} do
+      conn = get(conn, "/api/seeds/status?task_id=invalid_id")
+      response = json_response(conn, 200)
+
+      assert response["status"] == "error"
+      assert response["message"] == "Task not found"
+    end
+
+    test "returns success for valid task_id", %{conn: conn} do
+      # Создаём задачу
+      {:ok, task_id} = AsyncSeeds.enqueue(10, 10, 10)
+
+      # Ждём завершения задачи
+      Process.sleep(1500)
+
+      conn = get(conn, "/api/seeds/status?task_id=#{task_id}")
+      response = json_response(conn, 200)
+
+      assert response["status"] == "success"
+      assert response["data"]["task_id"] == task_id
+      assert response["data"]["status"] == "completed"
+      assert response["data"]["users_count"] == 10
+      assert response["data"]["rooms_count"] == 10
+      assert response["data"]["meetings_count"] == 10
     end
   end
 
@@ -51,7 +115,9 @@ defmodule SeedsAppWeb.SeedsControllerTest do
       response = json_response(conn, 200)
 
       assert response["status"] == "success"
-      assert response["message"] == "Database cleared successfully"
+
+      assert response["message"] ==
+               "Database cleared successfully. Deleted: 5 Meetings, 5 Rooms, 5 Users/Accounts"
 
       # Проверяем, что данные очищены
       assert UsersAccounts.count() == 0

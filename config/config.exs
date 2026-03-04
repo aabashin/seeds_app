@@ -2,6 +2,9 @@ import Config
 
 config :seeds_app, ecto_repos: [SeedsApp.Repo]
 
+# Максимальное количество одновременно выполняемых асинхронных задач
+config :seeds_app, :max_async_queue_size, 5
+
 config :seeds_app, SeedsAppWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "your_secret_key_base_here_replace_in_production",

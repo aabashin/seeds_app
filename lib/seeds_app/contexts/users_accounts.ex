@@ -8,10 +8,15 @@ defmodule SeedsApp.Contexts.UsersAccounts do
   alias Ecto.Multi
 
   alias SeedsApp.ChunkHelper
+  alias SeedsApp.ChunkHelper
   alias SeedsApp.Contexts.Models.Account
   alias SeedsApp.Contexts.Models.User
   alias SeedsApp.GenerateParams
   alias SeedsApp.Repo
+  alias SeedsApp.Types
+
+  # Кол-во колонок для расчёта чанка (name, age, email, inserted_at, updated_at)
+  @columns_count 5
   alias SeedsApp.Types
 
   # Кол-во колонок для расчёта чанка (name, age, email, inserted_at, updated_at)
@@ -77,13 +82,14 @@ defmodule SeedsApp.Contexts.UsersAccounts do
   Deletes all Accounts and Users records
   Anough to delete Users, because in account reference on_delete: :delete_all
   """
-  @spec delete_all() :: {:ok, any()} | {:error, any()}
+  @spec delete_all() :: {pos_integer(), nil}
   def delete_all, do: Repo.delete_all(User)
 
   @doc """
   Creates batch of users with accounts using insert_all with chunking
   """
-  @spec create_batch(count :: pos_integer()) :: {:ok, Types.create_context_result()} | {:error, String.t()}
+  @spec create_batch(count :: pos_integer()) ::
+          {:ok, Types.create_context_result()} | {:error, String.t()}
   def create_batch(count) when is_integer(count) and count > 0 do
     start_id = get_max_user_id() + 1
     user_params_list = GenerateParams.users_list(start_id, count)
@@ -92,27 +98,32 @@ defmodule SeedsApp.Contexts.UsersAccounts do
     now = NaiveDateTime.utc_now()
 
     # Вставляем пользователей чанками
-    user_params_with_timestamps = Enum.map(user_params_list, fn params ->
-      Map.merge(params, %{inserted_at: now, updated_at: now})
-    end)
+    user_params_with_timestamps =
+      Enum.map(user_params_list, fn params ->
+        Map.merge(params, %{inserted_at: now, updated_at: now})
+      end)
 
-    {:ok, users_result} = ChunkHelper.chunk_insert(
-      user_params_with_timestamps,
-      @columns_count,
-      fn chunk -> Repo.insert_all(User, chunk, returning: [:id]) end
-    )
+    {:ok, users_result} =
+      ChunkHelper.chunk_insert(
+        user_params_with_timestamps,
+        @columns_count,
+        fn chunk -> Repo.insert_all(User, chunk, returning: [:id]) end
+      )
 
     # Получаем только id вставленных пользователей (те, которые >= start_id)
-    user_ids = User
+    user_ids =
+      User
       |> where([u], u.id >= ^start_id)
       |> select([u], u.id)
       |> Repo.all()
 
     # Генерируем и вставляем аккаунты чанками
     account_params_list = GenerateParams.accounts_list(user_ids)
-    account_params_with_timestamps = Enum.map(account_params_list, fn params ->
-      Map.merge(params, %{inserted_at: now, updated_at: now})
-    end)
+
+    account_params_with_timestamps =
+      Enum.map(account_params_list, fn params ->
+        Map.merge(params, %{inserted_at: now, updated_at: now})
+      end)
 
     # Для accounts тоже 5 колонок (balance, login, user_id, inserted_at, updated_at)
     ChunkHelper.chunk_insert(

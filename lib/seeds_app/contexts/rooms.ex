@@ -67,7 +67,7 @@ defmodule SeedsApp.Contexts.Rooms do
   @doc """
   Deletes ell Rooms from DB
   """
-  @spec delete_all() :: nil
+  @spec delete_all() :: {pos_integer(), nil}
   def delete_all do
     Repo.delete_all(Room)
   end
@@ -75,24 +75,29 @@ defmodule SeedsApp.Contexts.Rooms do
   @doc """
   Creates batch of rooms using insert_all with chunking
   """
-  @spec create_batch(count :: pos_integer()) :: {:ok, Types.create_context_result()} | {:error, String.t()}
+  @spec create_batch(count :: pos_integer()) ::
+          {:ok, Types.create_context_result()} | {:error, String.t()}
   def create_batch(count) when is_integer(count) and count > 0 do
     start_id = get_max_id() + 1
     room_params_list = GenerateParams.rooms_list(start_id, count)
 
     now = NaiveDateTime.utc_now()
-    room_params_with_timestamps = Enum.map(room_params_list, fn params ->
-      Map.merge(params, %{inserted_at: now, updated_at: now})
-    end)
 
-    {:ok, rooms_result} = ChunkHelper.chunk_insert(
-      room_params_with_timestamps,
-      @columns_count,
-      fn chunk -> Repo.insert_all(Room, chunk, returning: [:id]) end
-    )
+    room_params_with_timestamps =
+      Enum.map(room_params_list, fn params ->
+        Map.merge(params, %{inserted_at: now, updated_at: now})
+      end)
+
+    {:ok, rooms_result} =
+      ChunkHelper.chunk_insert(
+        room_params_with_timestamps,
+        @columns_count,
+        fn chunk -> Repo.insert_all(Room, chunk, returning: [:id]) end
+      )
 
     # Получаем только id вставленных записей (те, которые >= start_id)
-    room_ids = Room
+    room_ids =
+      Room
       |> where([r], r.id >= ^start_id)
       |> select([r], r.id)
       |> Repo.all()

@@ -8,6 +8,8 @@ defmodule SeedsApp.Application do
     children = [
       SeedsApp.Repo,
       {Phoenix.PubSub, name: SeedsApp.PubSub},
+      {Task.Supervisor, name: SeedsApp.TaskSupervisor},
+      SeedsApp.AsyncSeeds,
       SeedsAppWeb.Endpoint
     ]
 
