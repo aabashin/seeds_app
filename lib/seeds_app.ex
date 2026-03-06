@@ -59,9 +59,15 @@ defmodule SeedsApp do
   end
 
   def clear_all do
-    Meetings.delete_all()
-    Rooms.delete_all()
-    UsersAccounts.delete_all()
+    {deleted_meetings_count, _} = Meetings.delete_all()
+    {deleted_rooms_count, _} = Rooms.delete_all()
+    {deleted_users_accounts_count, _} = UsersAccounts.delete_all()
+
+    %{
+      deleted_meetings_count: deleted_meetings_count,
+      deleted_rooms_count: deleted_rooms_count,
+      deleted_users_accounts_count: deleted_users_accounts_count
+    }
   end
 
   @spec response(

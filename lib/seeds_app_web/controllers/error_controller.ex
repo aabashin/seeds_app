@@ -1,7 +1,7 @@
 defmodule SeedsAppWeb.ErrorController do
   use SeedsAppWeb, :controller
 
-  plug :put_layout, false
+  plug(:put_layout, false)
 
   def not_found(conn, _params) do
     conn

@@ -1,6 +1,29 @@
 defmodule SeedsAppWeb.RouterTest do
   use SeedsAppWeb.ConnCase
 
+  alias SeedsApp.AsyncSeeds
+
+  setup do
+    # Запускаем TaskSupervisor и AsyncSeeds для тестов
+    case Process.whereis(SeedsApp.TaskSupervisor) do
+      nil ->
+        start_supervised!({Task.Supervisor, name: SeedsApp.TaskSupervisor})
+
+      _ ->
+        :ok
+    end
+
+    case Process.whereis(AsyncSeeds) do
+      nil ->
+        start_supervised!(AsyncSeeds)
+
+      _ ->
+        AsyncSeeds.clear_queue()
+    end
+
+    :ok
+  end
+
   test "POST /api/seeds routes to seeds controller create action", %{conn: conn} do
     conn = post(conn, "/api/seeds")
     assert conn.state == :sent

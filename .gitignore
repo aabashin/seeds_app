@@ -5,3 +5,4 @@
 /.elixir_ls
 erl_crash.dump
 /.ai/
+.koda_rules.md

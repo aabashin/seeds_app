@@ -2,26 +2,62 @@ defmodule SeedsAppWeb.SeedsController do
   use Phoenix.Controller
 
   alias SeedsApp
+  alias SeedsApp.AsyncSeeds
 
-  plug :put_layout, false
+  plug(:put_layout, false)
 
   def create(conn, params) do
     users_count = parse_integer(params["users_count"], 10)
     rooms_count = parse_integer(params["rooms_count"], 10)
     meetings_count = parse_integer(params["meetings_count"], 10)
 
-    case SeedsApp.seeds(users_count, rooms_count, meetings_count) do
-      {:ok, %{message: message}} ->
-        json(conn, %{status: "success", message: message})
+    case AsyncSeeds.enqueue(users_count, rooms_count, meetings_count) do
+      {:ok, task_id} ->
+        json(conn, %{status: "success", message: "Task enqueued", task_id: task_id})
 
-      {:error, errors} ->
-        json(conn, %{status: "error", message: errors})
+      {:error, :queue_full} ->
+        json(conn, %{status: "error", message: "Queue is full, try again later"})
+    end
+  end
+
+  def status(conn, params) do
+    task_id = params["task_id"]
+
+    if task_id do
+      case AsyncSeeds.get_status(task_id) do
+        nil ->
+          json(conn, %{status: "error", message: "Task not found"})
+
+        task_status ->
+          json(conn, %{
+            status: "success",
+            data: %{
+              task_id: task_status.task_id,
+              status: task_status.status,
+              users_count: task_status.users_count,
+              rooms_count: task_status.rooms_count,
+              meetings_count: task_status.meetings_count,
+              error: task_status.error
+            }
+          })
+      end
+    else
+      json(conn, %{status: "error", message: "task_id is required"})
     end
   end
 
   def clear(conn, _params) do
-    SeedsApp.clear_all()
-    json(conn, %{status: "success", message: "Database cleared successfully"})
+    %{
+      deleted_meetings_count: deleted_meetings_count,
+      deleted_rooms_count: deleted_rooms_count,
+      deleted_users_accounts_count: deleted_users_accounts_count
+    } = SeedsApp.clear_all()
+
+    json(conn, %{
+      status: "success",
+      message:
+        "Database cleared successfully. Deleted: #{deleted_meetings_count} Meetings, #{deleted_rooms_count} Rooms, #{deleted_users_accounts_count} Users/Accounts"
+    })
   end
 
   def stats(conn, _params) do
