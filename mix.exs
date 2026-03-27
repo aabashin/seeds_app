@@ -28,6 +28,7 @@ defmodule SeedsApp.MixProject do
       {:dialyxir, "1.4.5", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7.10", only: [:dev, :test], runtime: false},
       {:ex_machina, "~> 2.8", only: :test},
+      {:mimic, "~> 2.0", only: :test},
       {:phoenix, "~> 1.7.0"},
       {:phoenix_html, "~> 3.3"},
       {:phoenix_view, "~> 2.0"},

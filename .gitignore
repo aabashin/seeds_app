@@ -6,3 +6,5 @@
 erl_crash.dump
 /.ai/
 .koda_rules.md
+KODA.md
+test.sh

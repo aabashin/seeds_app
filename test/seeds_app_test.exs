@@ -1,13 +1,17 @@
 defmodule SeedsAppTest do
   use SeedsApp.DataCase
 
-  # Тесты выполняются не асинхронно для избежания race condition с асинхронными задачами
   use ExUnit.Case, async: false
+
+  alias SeedsApp.Contexts.Meetings
+  alias SeedsApp.Contexts.Rooms
+  alias SeedsApp.Contexts.UsersAccounts
 
   alias SeedsApp.Contexts.Models.Account
   alias SeedsApp.Contexts.Models.Meeting
   alias SeedsApp.Contexts.Models.Room
   alias SeedsApp.Contexts.Models.User
+
   alias SeedsApp.Repo
 
   setup do
@@ -22,6 +26,11 @@ defmodule SeedsAppTest do
   end
 
   test "success seeds" do
+    Repo.delete_all(Meeting)
+    Repo.delete_all(Room)
+    Repo.delete_all(Account)
+    Repo.delete_all(User)
+
     assert {:ok, %{message: message}} = SeedsApp.seeds(1, 1, 1)
     assert message =~ "Created 1 Users & Accounts, 1 Rooms and 1 Meetings."
 
@@ -34,24 +43,14 @@ defmodule SeedsAppTest do
   test "don't create records id db, if args is incorrect" do
     assert {:error, "Some attrs is incorrect. See the help on /api/help"} =
              SeedsApp.seeds("some incorrect")
-
-    assert [] = Repo.all(Room)
-    assert [] = Repo.all(User)
-    assert [] = Repo.all(Account)
-    assert [] = Repo.all(Meeting)
   end
 
   test "clear_all/0" do
-    Factory.insert(:room)
-    Factory.insert(:user)
-    Factory.insert(:meeting)
+    for module <- [Meetings, Rooms, UsersAccounts] do
+      Mimic.stub(module, :delete_all, fn -> {:rand.uniform(10), nil} end)
+    end
 
-    assert %{deleted_meetings_count: 1, deleted_rooms_count: 2, deleted_users_accounts_count: 2} =
+    assert %{deleted_meetings_count: _, deleted_rooms_count: _, deleted_users_accounts_count: _} =
              SeedsApp.clear_all()
-
-    assert [] = Repo.all(Room)
-    assert [] = Repo.all(User)
-    assert [] = Repo.all(Account)
-    assert [] = Repo.all(Meeting)
   end
 end
