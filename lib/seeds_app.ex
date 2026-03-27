@@ -39,16 +39,20 @@ defmodule SeedsApp do
     # Используем батчевое создание для повышения производительности
     with {:ok, users_result} <- UsersAccounts.create_batch(users_accounts_count),
          {:ok, rooms_result} <- Rooms.create_batch(rooms_count),
-         {:ok, meetings_result} <- Meetings.create_batch(
-           meetings_count,
-           users_result.ids,
-           rooms_result.ids
-         ) do
-      response(%{
-        users_result: users_result,
-        rooms_result: rooms_result,
-        meetings_result: meetings_result
-      }, start_time)
+         {:ok, meetings_result} <-
+           Meetings.create_batch(
+             meetings_count,
+             users_result.ids,
+             rooms_result.ids
+           ) do
+      response(
+        %{
+          users_result: users_result,
+          rooms_result: rooms_result,
+          meetings_result: meetings_result
+        },
+        start_time
+      )
     else
       {:error, reason} -> {:error, reason}
     end
@@ -59,6 +63,7 @@ defmodule SeedsApp do
   end
 
   def clear_all do
+    # Удаляем в правильном порядке: сначала зависимые таблицы
     {deleted_meetings_count, _} = Meetings.delete_all()
     {deleted_rooms_count, _} = Rooms.delete_all()
     {deleted_users_accounts_count, _} = UsersAccounts.delete_all()

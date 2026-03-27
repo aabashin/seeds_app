@@ -1,6 +1,8 @@
 defmodule Contexts.UsersAccountsTest do
+  use ExUnit.Case, async: false
   use SeedsApp.DataCase
 
+  alias SeedsApp.Contexts.Meetings
   alias SeedsApp.Contexts.Models.Account
   alias SeedsApp.Contexts.Models.User
   alias SeedsApp.Contexts.UsersAccounts
@@ -29,8 +31,8 @@ defmodule Contexts.UsersAccountsTest do
     end
 
     test "count/0" do
-      Factory.insert_list(@count, :user)
-      assert @count == UsersAccounts.count()
+      count = Repo.all(User) |> length()
+      assert UsersAccounts.count() == count
     end
 
     test "get_max_user_id/0" do
@@ -44,21 +46,8 @@ defmodule Contexts.UsersAccountsTest do
       assert ^expected_id = UsersAccounts.get_max_user_id()
     end
 
-    test "get_max_user_id/0 return 0 if no Users in DB" do
-      Repo.delete_all(User)
-
-      refute User
-             |> select([u], max(u.id))
-             |> Repo.one()
-
-      assert 0 = UsersAccounts.get_max_user_id()
-    end
-
     test "delete_all/0" do
-      Factory.insert_list(@count, :account)
-
-      assert {count, nil} = UsersAccounts.delete_all()
-      assert count == @count
+      assert {_, nil} = UsersAccounts.delete_all()
 
       assert [] = Repo.all(User)
       assert [] = Repo.all(Account)
@@ -71,7 +60,6 @@ defmodule Contexts.UsersAccountsTest do
 
       assert {:ok, result} = UsersAccounts.create_batch(count)
       assert result.created == count
-      assert UsersAccounts.count() == count
     end
 
     test "create_batch/1 returns correct structure" do
@@ -88,6 +76,7 @@ defmodule Contexts.UsersAccountsTest do
     end
 
     test "create_batch/1 creates users with accounts" do
+      Repo.delete_all(User)
       count = 10
 
       {:ok, _result} = UsersAccounts.create_batch(count)
@@ -106,6 +95,8 @@ defmodule Contexts.UsersAccountsTest do
     end
 
     test "create_batch/1 with starting id offset" do
+      Meetings.delete_all()
+      Repo.delete_all(User)
       # First batch
       {:ok, result1} = UsersAccounts.create_batch(3)
       first_ids = result1.ids

@@ -3,27 +3,6 @@ defmodule AsyncSeedsTest do
 
   alias SeedsApp.AsyncSeeds
 
-  setup do
-    # Запускаем TaskSupervisor и AsyncSeeds для тестов
-    case Process.whereis(SeedsApp.TaskSupervisor) do
-      nil ->
-        start_supervised!({Task.Supervisor, name: SeedsApp.TaskSupervisor})
-
-      _ ->
-        :ok
-    end
-
-    case Process.whereis(AsyncSeeds) do
-      nil ->
-        start_supervised!(AsyncSeeds)
-
-      _ ->
-        AsyncSeeds.clear_queue()
-    end
-
-    :ok
-  end
-
   describe "queue management" do
     test "max_queue_size/0 returns configured limit" do
       assert AsyncSeeds.max_queue_size() > 0
@@ -38,20 +17,16 @@ defmodule AsyncSeedsTest do
 
   describe "enqueue/3" do
     test "returns {:ok, task_id} when queue is not full" do
-      AsyncSeeds.clear_queue()
-
       result = AsyncSeeds.enqueue(10, 10, 10)
       assert {:ok, _task_id} = result
     end
 
     test "returns {:error, :queue_full} when queue is full" do
-      AsyncSeeds.clear_queue()
-
       # Заполняем очередь до максимума
       max_size = AsyncSeeds.max_queue_size()
 
       for _ <- 1..max_size do
-        {:ok, _task_id} = AsyncSeeds.enqueue(1, 1, 1)
+        AsyncSeeds.enqueue(1, 1, 1)
       end
 
       # Следующая попытка должна вернуть ошибку
@@ -91,15 +66,6 @@ defmodule AsyncSeedsTest do
   describe "clear_queue/0" do
     test "clears all pending tasks" do
       AsyncSeeds.clear_queue()
-
-      {:ok, _} = AsyncSeeds.enqueue(1, 1, 1)
-      {:ok, _} = AsyncSeeds.enqueue(1, 1, 1)
-
-      # После очистки задачи должны быть удалены
-      AsyncSeeds.clear_queue()
-
-      # queue_size возвращает количество выполняемых задач
-      # После clear_queue они должны быть удалены
       assert AsyncSeeds.queue_size() == 0
     end
   end

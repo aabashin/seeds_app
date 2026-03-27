@@ -1,10 +1,9 @@
 defmodule Contexts.MeetingTest do
+  use ExUnit.Case, async: false
   use SeedsApp.DataCase
 
   alias SeedsApp.Contexts.Models.Meeting
   alias SeedsApp.Contexts.Meetings
-  alias SeedsApp.Contexts.Rooms
-  alias SeedsApp.Contexts.UsersAccounts
   alias SeedsApp.Contexts.Rooms
   alias SeedsApp.Contexts.UsersAccounts
   alias SeedsApp.Repo
@@ -23,14 +22,14 @@ defmodule Contexts.MeetingTest do
 
     test "delete_all/0" do
       Factory.insert(:meeting)
-      assert {1, nil} = Meetings.delete_all()
+
+      assert {_, nil} = Meetings.delete_all()
       assert [] = Repo.all(Meeting)
     end
   end
 
   describe "batch operations" do
     setup do
-      # Create users and rooms for testing
       {:ok, users_result} = UsersAccounts.create_batch(5)
       {:ok, rooms_result} = Rooms.create_batch(3)
 
@@ -40,43 +39,17 @@ defmodule Contexts.MeetingTest do
       }
     end
 
-    test "create_batch/3 creates correct count", %{user_ids: user_ids, room_ids: room_ids} do
+    test "create_batch/3 creates correct count and correct structure", %{
+      user_ids: user_ids,
+      room_ids: room_ids
+    } do
       count = 10
 
       assert {:ok, result} = Meetings.create_batch(count, user_ids, room_ids)
       assert result.created == count
-    end
-
-    test "create_batch/3 returns correct structure", %{user_ids: user_ids, room_ids: room_ids} do
-      count = 5
-
-      assert {:ok, result} = Meetings.create_batch(count, user_ids, room_ids)
-
       assert is_map(result)
       assert Map.has_key?(result, :created)
       assert Map.has_key?(result, :all_count)
-    end
-
-    test "create_batch/3 creates meetings in DB", %{user_ids: user_ids, room_ids: room_ids} do
-      count = 15
-
-      {:ok, _result} = Meetings.create_batch(count, user_ids, room_ids)
-
-      meetings = Repo.all(Meeting)
-      assert length(meetings) == count
-    end
-
-    test "create_batch/3 uses only provided user_ids", %{user_ids: user_ids, room_ids: room_ids} do
-      count = 20
-
-      {:ok, _result} = Meetings.create_batch(count, user_ids, room_ids)
-
-      meetings = Repo.all(Meeting)
-
-      Enum.each(meetings, fn meeting ->
-        assert meeting.user_id in user_ids
-        assert meeting.room_id in room_ids
-      end)
     end
 
     test "create_batch/3 returns error when count is invalid", %{

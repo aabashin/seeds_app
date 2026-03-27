@@ -18,11 +18,18 @@ defmodule SeedsAppWeb.ConnCase do
   end
 
   setup tags do
+    Mimic.set_mimic_from_context(tags)
+    Mimic.verify_on_exit!()
+
+    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(SeedsApp.Repo, shared: not tags[:async])
+
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(SeedsApp.Repo)
 
     unless tags[:async] do
       Ecto.Adapters.SQL.Sandbox.mode(SeedsApp.Repo, {:shared, self()})
     end
+
+    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
 
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
