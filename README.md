@@ -76,6 +76,12 @@ $ curl http://localhost:4000/api/seeds/status?task_id=a1b2c3d4e5f6
 # Clear database
 $ curl -X DELETE http://localhost:4000/api/seeds
 
+# Example response:
+# {
+#    "message": "Database cleared successfully. Deleted: 100000 Meetings, 100000 Rooms, 100000 Users/Accounts",
+#    "status": "success"
+#}
+
 # View statistics
 $ curl http://localhost:4000/api/stats
 ```

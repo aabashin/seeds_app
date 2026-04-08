@@ -17,6 +17,35 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - seeds_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: seeds_app
+    environment:
+      DB: seeds_dev
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+      PHX_HOST: localhost
+      PHX_PORT: 4000
+      SECRET_KEY_BASE: sX+01us8enwOjI2sF7xiDmakd28fMwOZn/VbNwa56K06EDuLlGoAdEnVl+npBk6Y
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - seeds_network
+    restart: unless-stopped
+
+networks:
+  seeds_network:
+    driver: bridge
 
 volumes:
   postgres_data:
