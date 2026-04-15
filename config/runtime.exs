@@ -29,12 +29,11 @@ if config_env() == :prod do
     username: db_username,
     password: db_password,
     hostname: db_host,
-    port: db_port,
+    port: String.to_integer(db_port),
     pool_size: 10,
     timeout: 120_000,
     queue_target: 5000,
     queue_interval: 100_000,
     ownership_timeout: 15_000_000,
-    pool: Ecto.Adapters.SQL.Sandbox,
     log: :debug
 end
