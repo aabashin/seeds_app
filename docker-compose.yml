@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -20,20 +18,20 @@ services:
     networks:
       - seeds_network
 
-  app:
+  seeds_app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: seeds_app
     environment:
-      DB: seeds_dev
-      DB_USER: postgres
-      DB_PASS: postgres
-      DB_HOST: postgres
-      DB_PORT: 5432
-      PHX_HOST: localhost
-      PHX_PORT: 4000
-      SECRET_KEY_BASE: sX+01us8enwOjI2sF7xiDmakd28fMwOZn/VbNwa56K06EDuLlGoAdEnVl+npBk6Y
+      - PHX_HOST=localhost
+      - PHX_PORT=4000
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASS=postgres
+      - DB=seeds_dev
+      - SECRET_KEY_BASE=your_secret_key_base_here_replace_in_production
     ports:
       - "4000:4000"
     depends_on:

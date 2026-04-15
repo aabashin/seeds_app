@@ -1,0 +1,45 @@
+# Git
+.git
+.gitignore
+
+# Build artifacts
+_build
+deps
+
+# Local environment files
+*.local
+.env
+.env.*
+
+# IDE и редакторы
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Тесты и покрытие
+cover
+tmp
+
+# Лог-файлы
+*.log
+log
+
+# Кэш
+.elixir_ls
+.cache
+
+# Документация AI
+.ai
+
+# Docker (если есть)
+.docker
+
+# Migrations тестовые
+priv/repo/migrations/test_*
+
+# Другие
+README.md
+*.md
+LICENSE

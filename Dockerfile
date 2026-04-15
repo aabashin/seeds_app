@@ -1,57 +1,72 @@
-# Исходный образ Elixir
-FROM elixir:1.18-alpine AS builder
+# Мультистейдж сборка для оптимизации размера финального образа
 
-# Установка Node.js и npm для Phoenix
-RUN apk add --no-cache nodejs npm
+# --- Стадия 1: Сборка зависимостей ---
+FROM elixir:1.19-alpine AS deps
 
-# Установка PostgreSQL клиента
-RUN apk add --no-cache postgresql-client
+# Установка необходимых пакетов для сборки нативных зависимостей
+RUN apk add --no-cache \
+    build-base \
+    git
 
-# Создание пользователя app
-RUN addgroup -g 1000 app && adduser -u 1000 -G app -s /bin/sh -D app
+WORKDIR /build
 
-WORKDIR /app
-
-# Копируем зависимости и mix-файлы
+# Копирование файлов манифеста зависимостей
 COPY mix.exs mix.lock ./
 
-# Установка зависимостей Elixir
+# Установка зависимостей
 RUN mix local.hex --force && \
     mix local.rebar --force && \
-    mix deps.get --only prod
+    mix deps.get
 
-# Копируем исходный код
-COPY config config/
-COPY lib lib/
-COPY priv priv/
+# --- Стадия 2: Сборка приложения ---
+FROM deps AS build
 
-# Компиляция приложения
-ENV MIX_ENV=prod
-RUN mix phx.digest && \
-    mix release
+WORKDIR /build
 
-# Финальный образ
-FROM alpine:3.19
+# Копирование исходного кода
+COPY lib ./lib
+COPY priv ./priv
+COPY config ./config
+COPY rel ./rel
 
-# Установка необходимых пакетов
-RUN apk add --no-cache openssl postgresql-client
+# Компиляция приложения в продакшен-режиме с созданием релиза
+RUN MIX_ENV=prod mix compile && \
+    MIX_ENV=prod mix release
 
-# Создание пользователя app
-RUN addgroup -g 1000 app && adduser -u 1000 -G app -s /bin/sh -D app
+# --- Стадия 3: Финальный образ для запуска ---
+FROM elixir:1.19-alpine AS final
+
+# Установка необходимых пакетов для runtime
+RUN apk add --no-cache \
+    libstdc++ \
+    ncurses \
+    openssl \
+    gcompat
 
 WORKDIR /app
 
-# Копируем релиз из builder
-COPY --from=builder --chown=app:app /app/_build/prod/rel/seeds_app ./
+# Создание нефпривилегированного пользователя для безопасности
+RUN addgroup -g 1000 app && \
+    adduser -u 1000 -G app -h /app -D app
 
-# Права на директорию
-RUN chown -R app:app /app
+# Копирование релиза из стадии build
+COPY --from=build --chown=app:app /build/_build/prod/rel/seeds_app ./
 
-# Переключаемся на пользователя app
+# Переключение на нефривилегированного пользователя
 USER app
 
-# Запуск приложения
-ENV MIX_ENV=prod
+# Переменные окружения по умолчанию
+ENV PHX_HOST=localhost \
+    PHX_PORT=4000 \
+    DB_HOST=postgres \
+    DB_PORT=5432 \
+    DB_USER=postgres \
+    DB_PASS=postgres \
+    DB=seeds_dev \
+    SECRET_KEY_BASE=your_secret_key_base_here_replace_in_production
+
+# Экспонирование порта Phoenix приложения
 EXPOSE 4000
 
+# Команда запуска приложения
 CMD ["bin/seeds_app", "start"]

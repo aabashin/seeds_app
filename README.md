@@ -1,26 +1,96 @@
 # Seeds_App
 
-Simple elixir application with Ecto lib and Posgrex adapter for demonstrate Elixir works with DB
+Простое Elixir-приложение с Ecto и Postgrex для демонстрации работы с базой данных PostgreSQL.
 
-Need installed and setuped PostgreSQL, Erlang 27.1.1 and Elixir 1.18.4-otp-27
+## Требования
 
-## Run app in production mode
+### Для локальной разработки
+- Erlang 28.3.2
+- Elixir 1.19.5-otp-28
+- PostgreSQL
 
-Set env variables:
+---
 
-- PHX_HOST
-- PHX_PORT
-- DB
-- DB_USER
-- DB_PASS
-- DB_HOST
+## Запуск в Docker
+
+### Быстрый старт
+
+```bash
+# Клонировать репозиторий
+git clone https://github.com/aabashin/seeds_app.git
+cd seeds_app
+
+# Запустить все сервисы (PostgreSQL + приложение)
+docker compose up -d
+
+# Проверить статус
+docker compose ps
+
+# Просмотр логов
+docker compose logs -f seeds_app
+```
+
+### Остановка сервисов
+
+```bash
+docker compose down
+```
+
+### Пересборка образа
+
+```bash
+docker compose build --no-cache
+docker compose up -d
+```
+
+### Доступ к приложению
+
+- Описание API: http://localhost:4000/api/help
+- PostgreSQL (внешний доступ): localhost:5433
+
+### Переменные окружения
+
+| Переменная | Описание | Значение по умолчанию |
+|------------|----------|----------------------|
+| `PHX_HOST` | Хост приложения | `localhost` |
+| `PHX_PORT` | Порт приложения | `4000` |
+| `DB_HOST` | Хост базы данных | `postgres` |
+| `DB_PORT` | Порт базы данных | `5432` |
+| `DB_USER` | Пользователь БД | `postgres` |
+| `DB_PASS` | Пароль БД | `postgres` |
+| `DB` | Имя базы данных | `seeds_dev` |
+| `SECRET_KEY_BASE` | Секрет для сессий | (заменить в production) |
+
+### Пример запуска с кастомными настройками
+
+```bash
+docker compose up -d \
+  -e PHX_PORT=4080 \
+  -e DB_HOST=custom-db \
+  -e DB_PASS=secret_password
+```
+
+---
+
+---
+
+## Запуск в режиме production (без Docker)
+
+Установите переменные окружения:
+
+- `PHX_HOST`
+- `PHX_PORT`
+- `DB`
+- `DB_USER`
+- `DB_PASS`
+- `DB_HOST`
 
 ```bash
 $ git clone https://github.com/aabashin/seeds_app.git
 $ cd seeds_app
 ```
 
-Set variables in `config/runtime.exs`
+Настройте переменные в `config/runtime.exs`:
 
 ```bash
 $ MIX_ENV=prod mix release
@@ -28,7 +98,8 @@ $ cd _build/prod/rel/seeds_app/bin
 $ ./seeds_app start
 ```
 
-## Run app in dev mode
+## Запуск в режиме development
+```
 
 ```bash
 git clone https://github.com/aabashin/seeds_app.git
